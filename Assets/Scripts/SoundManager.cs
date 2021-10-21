@@ -1,0 +1,49 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
+
+public class SoundManager : MonoBehaviour
+{
+    public static SoundManager _instance;
+    private AudioSource audioSource;
+    public AudioClip good_job, try_again;
+    public List<AudioClip> wordClips = new List<AudioClip>();
+    private int randomNumber;
+    public string currentWord;
+    public GameObject gameManager;
+
+
+    private void Start()
+    {
+        _instance = this;
+        audioSource = GetComponent<AudioSource>();
+    }
+
+
+    public void PlayRandomWordClip(List<AudioClip> wordClips)
+    {
+        if (GameManager._instance.isWinning)
+        {
+            Debug.Log("winning");
+            return;
+        }
+        randomNumber = Random.Range(0, wordClips.Count);
+        audioSource.PlayOneShot(wordClips[randomNumber]);
+        currentWord = wordClips[randomNumber].name;
+        wordClips.Remove(wordClips[randomNumber]);
+        Debug.Log(currentWord);
+    }
+
+    public void PlayTryAgainClip()
+    {
+        audioSource.PlayOneShot(try_again);
+    }
+
+    public void PlayGoodJobClip()
+    {
+        audioSource.PlayOneShot(good_job);
+    }
+
+
+}
