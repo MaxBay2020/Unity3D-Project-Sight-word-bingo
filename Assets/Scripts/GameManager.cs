@@ -137,7 +137,7 @@ public class GameManager : MonoBehaviour
     }
     IEnumerator DelaySec()
     {
-        yield return new WaitForSeconds(0.2f);
+        yield return new WaitForSeconds(1f);
         SoundManager._instance.PlayRandomWordClip(SoundManager._instance.wordClips);
         currentWord = SoundManager._instance.currentWord;
         hintText.text = currentWord.ToLower();

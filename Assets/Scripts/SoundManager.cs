@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -12,6 +13,7 @@ public class SoundManager : MonoBehaviour
     private int randomNumber;
     public string currentWord;
     public GameObject gameManager;
+    private bool isDone;
 
 
     private void Start()
@@ -21,6 +23,8 @@ public class SoundManager : MonoBehaviour
         audioSource.PlayOneShot(instructionClip);
         StartCoroutine(StartPlaying());
     }
+
+
     IEnumerator StartPlaying()
     {
         yield return new WaitForSeconds(instructionClip.length);
@@ -35,6 +39,7 @@ public class SoundManager : MonoBehaviour
             Debug.Log("winning");
             return;
         }
+
 
         randomNumber = Random.Range(0, wordClips.Count);
         audioSource.PlayOneShot(wordClips[randomNumber]);
