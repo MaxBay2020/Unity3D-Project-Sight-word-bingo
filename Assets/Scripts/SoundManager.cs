@@ -7,7 +7,7 @@ public class SoundManager : MonoBehaviour
 {
     public static SoundManager _instance;
     private AudioSource audioSource;
-    public AudioClip good_job, try_again;
+    public AudioClip good_job, try_again, instructionClip;
     public List<AudioClip> wordClips = new List<AudioClip>();
     private int randomNumber;
     public string currentWord;
@@ -18,8 +18,15 @@ public class SoundManager : MonoBehaviour
     {
         _instance = this;
         audioSource = GetComponent<AudioSource>();
+        audioSource.PlayOneShot(instructionClip);
+        StartCoroutine(StartPlaying());
     }
+    IEnumerator StartPlaying()
+    {
+        yield return new WaitForSeconds(instructionClip.length);
+        gameManager.SetActive(true);
 
+    }
 
     public void PlayRandomWordClip(List<AudioClip> wordClips)
     {
@@ -28,6 +35,7 @@ public class SoundManager : MonoBehaviour
             Debug.Log("winning");
             return;
         }
+
         randomNumber = Random.Range(0, wordClips.Count);
         audioSource.PlayOneShot(wordClips[randomNumber]);
         currentWord = wordClips[randomNumber].name;

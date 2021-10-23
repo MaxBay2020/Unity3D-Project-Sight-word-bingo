@@ -19,7 +19,7 @@ public class WordCell : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (GameManager._instance.isWinning)
+        if (GameManager._instance !=null && GameManager._instance.isWinning)
         {
             Debug.Log("winning");
             return;
