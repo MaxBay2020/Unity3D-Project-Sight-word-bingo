@@ -7,13 +7,14 @@ using UnityEngine.UI;
 public class SoundManager : MonoBehaviour
 {
     public static SoundManager _instance;
-    private AudioSource audioSource;
+    public AudioSource audioSource;
     public AudioClip good_job, try_again, instructionClip;
     public List<AudioClip> wordClips = new List<AudioClip>();
     private int randomNumber;
     public string currentWord;
     public GameObject gameManager;
     private bool isDone;
+    public List<AudioClip> letterSoundAllClips;
 
 
     private void Start()
@@ -56,6 +57,11 @@ public class SoundManager : MonoBehaviour
     public void PlayGoodJobClip()
     {
         audioSource.PlayOneShot(good_job);
+    }
+
+    public void PlaySepecifyClip(AudioClip targetClip)
+    {
+        audioSource.PlayOneShot(targetClip);
     }
 
 

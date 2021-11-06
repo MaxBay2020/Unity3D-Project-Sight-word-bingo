@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using System.Linq;
+using DG.Tweening;
 
 public class GameManager : MonoBehaviour
 {
@@ -32,6 +34,14 @@ public class GameManager : MonoBehaviour
     private bool isPlayed;
     public Text hintText;
     public GameObject winningPanel;
+    public List<int> whichWinningCondition;
+    public bool hasFound;
+    public List<Transform> whichCondition;
+    public List<Transform> allWords = new List<Transform>();
+
+    public int sec_of_3 = 3;
+
+    public List<AudioClip> correctWords = new List<AudioClip>();
 
     private void Start()
     {
@@ -55,8 +65,48 @@ public class GameManager : MonoBehaviour
         if (isWinning && !isPlayed)
         {
             Debug.Log("winning");
-            winningPanel.SetActive(true);
-            combinations.RemoveRange(0, combinations.Count);
+            hasCurrentEle = false;
+            combinations.Sort();
+            foreach (var eachCondition in allWinningConditions)
+            {
+
+                if(eachCondition.All(t => combinations.Any(b => b == t)))
+                {
+                    whichWinningCondition = eachCondition;
+                    break;
+                }
+            }
+            whichWinningCondition.Sort();
+            //print(whichWinningCondition);
+            foreach (var item in whichWinningCondition)
+            {
+                print(item);
+            }
+
+            foreach (var eachWord in allWords)
+            {
+                int codeNumber = int.Parse(eachWord.name.Split(' ')[1]);
+                foreach (var item in whichWinningCondition)
+                {
+                    if (item == codeNumber)
+                    {
+                        whichCondition.Add(eachWord);
+                    }
+                }
+
+            }
+
+            foreach (var item in whichCondition)
+            {
+                GameObject targetCellGO = GameObject.Find(item.name);
+                targetCellGO.transform.Find("coin").DOPunchScale(new Vector3(0.1f, 0.1f, 0), sec_of_3, 3,0);
+            }
+            StartCoroutine(CoinVanish(sec_of_3, whichCondition) );
+
+
+
+            //winningPanel.SetActive(true);
+            //combinations.RemoveRange(0, combinations.Count);
             SoundManager._instance.PlayGoodJobClip();
             isPlayed = true;
             return;
@@ -86,43 +136,64 @@ public class GameManager : MonoBehaviour
                 if (hasCurrentEle)
                 {
                     isWinning = true;
+
                     break;
                 }
             }
         }
-        //if (combinations.Count >= 5)
-        //{
-        //    foreach (var eachList in allWinningConditions)
-        //    {
-        //        for (int i = 0; i < eachList.Count; i++)
-        //        {
-        //            if (!combinations.Contains(eachList[i]))
-        //            {
-        //                hasAllCurrentListEle = false;
-        //                break;
-        //            }
-                    
-        //        }
-        //        if (hasAllCurrentListEle)
-        //        {
-        //            isWinning = true;
-        //            return;
-        //        }
-        //        else
-        //        {
-        //            isWinning=false;
-        //            hasAllCurrentListEle = true;
 
-        //        }
-
-        //    }
-
-        //}
 
         foreach (Transform currentCell in cells)
         {
             currentCell.gameObject.SetActive(currentCell.name.Split(' ')[0].ToLower().Equals(currentWord.ToLower()));
         }
+    }
+
+    IEnumerator CoinVanish(int sec_of_3, List<Transform> whichCondition)
+    {
+        yield return new WaitForSeconds(sec_of_3);
+        foreach (var coin in whichCondition)
+        {
+            coin.gameObject.SetActive(false);
+        }
+        // play word audio one by one
+        foreach (var coin in whichCondition)
+        {
+            string coinName = coin.name.Split(' ')[0];
+            foreach (AudioClip eachClip in SoundManager._instance.letterSoundAllClips)
+            {
+                if (coinName.ToLower() == eachClip.name.ToLower())
+                {
+                    correctWords.Add(eachClip);
+                    //SoundManager._instance.audioSource.PlayOneShot(eachClip);
+                }
+            }
+
+            // play corrects words one by one
+            StartCoroutine(PlayWordClipOneByOne(1.0f));
+        }
+    }
+
+    IEnumerator PlayWordClipOneByOne(float seconds)
+    {
+        //new WaitForSeconds(0.5f);
+        for (int i = 0; i < correctWords.Count; i++)
+        {
+            yield return new WaitForSeconds(seconds);
+            SoundManager._instance.audioSource.PlayOneShot(correctWords[i]);
+            StartCoroutine(CoinsDisplay(seconds));
+        }
+    }
+
+    IEnumerator CoinsDisplay(float seconds)
+    {
+        foreach (var coin in whichCondition)
+        {
+            yield return new WaitForSeconds(seconds);
+            coin.gameObject.SetActive(true);
+        }
+        yield return new WaitForSeconds(0.5f);
+        winningPanel.SetActive(true);
     }
 
     public void PlayNextWord()
