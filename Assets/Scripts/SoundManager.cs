@@ -21,7 +21,7 @@ public class SoundManager : MonoBehaviour
     {
         _instance = this;
         audioSource = GetComponent<AudioSource>();
-        audioSource.PlayOneShot(instructionClip);
+        //audioSource.PlayOneShot(instructionClip);
         StartCoroutine(StartPlaying());
     }
 
